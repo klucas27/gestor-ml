@@ -1,5 +1,6 @@
 import { NavLink, Routes, Route, Navigate } from 'react-router-dom'
 import Produtos from './paginas/Produtos.jsx'
+import Calculadora from './paginas/Calculadora.jsx'
 
 // Placeholders das telas ainda não implementadas.
 // Serão substituídas pelos arquivos reais nas próximas etapas.
@@ -50,10 +51,7 @@ export default function App() {
             element={<EmBreve titulo="Registrar Venda" />}
           />
           <Route path="/historico" element={<EmBreve titulo="Histórico" />} />
-          <Route
-            path="/calculadora"
-            element={<EmBreve titulo="Calculadora" />}
-          />
+          <Route path="/calculadora" element={<Calculadora />} />
           <Route path="*" element={<EmBreve titulo="Página não encontrada" />} />
         </Routes>
       </main>

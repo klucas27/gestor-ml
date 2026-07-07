@@ -162,6 +162,84 @@ h2 {
   gap: 6px;
 }
 
+/* ---------- Select (mesmo visual dos inputs) ---------- */
+.campo select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.campo select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ---------- Calculadora: preços em destaque ---------- */
+.grade-precos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.preco-destaque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+}
+
+.preco-destaque.principal {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.preco-rotulo {
+  font-size: 13px;
+  color: #475569;
+}
+
+.preco-valor {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.preco-destaque.principal .preco-valor {
+  color: #1d4ed8;
+}
+
+/* ---------- Calculadora: linha de configuração de taxa ---------- */
+.linha-taxa {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.linha-taxa-nome {
+  font-weight: 600;
+  min-width: 120px;
+  align-self: center;
+}
+
+.mensagem-sucesso {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 10px 14px;
+  border-radius: 5px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
 /* ---------- Formulários ---------- */
 .cartao {
   background: #ffffff;
