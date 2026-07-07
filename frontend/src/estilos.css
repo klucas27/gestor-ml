@@ -1,0 +1,429 @@
+/* estilos.css — estilo único e simples do GestorML */
+
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: #1f2937;
+  background: #f4f6f8;
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+/* ---------- Layout geral ---------- */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Menu lateral ---------- */
+.menu-lateral {
+  width: 220px;
+  flex-shrink: 0;
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 20px 0;
+}
+
+.menu-lateral .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  padding: 0 20px 20px;
+  border-bottom: 1px solid #334155;
+  margin-bottom: 12px;
+}
+
+.menu-lateral nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.link-menu {
+  display: block;
+  padding: 12px 20px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 15px;
+  border-left: 3px solid transparent;
+}
+
+.link-menu:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.link-menu.ativo {
+  background: #0f172a;
+  color: #ffffff;
+  border-left-color: #3b82f6;
+  font-weight: 600;
+}
+
+/* ---------- Conteúdo ---------- */
+.conteudo {
+  flex: 1;
+  padding: 28px 32px;
+  min-width: 0;
+}
+
+.aviso-vazio {
+  color: #6b7280;
+}
+
+/* ---------- Tabelas ---------- */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabela th,
+.tabela td {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabela th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+}
+
+.tabela tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.tabela tbody tr:hover {
+  background: #eef2ff;
+}
+
+/* Faz a tabela rolar horizontalmente em telas estreitas */
+.tabela-rolante {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ---------- Botões ---------- */
+.botao {
+  display: inline-block;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background: #2563eb;
+}
+
+.botao.secundario {
+  background: #64748b;
+}
+
+.botao.secundario:hover {
+  background: #475569;
+}
+
+.botao.perigo {
+  background: #dc2626;
+}
+
+.botao.perigo:hover {
+  background: #b91c1c;
+}
+
+.botao.pequeno {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.acoes-linha {
+  display: flex;
+  gap: 6px;
+}
+
+/* ---------- Select (mesmo visual dos inputs) ---------- */
+.campo select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.campo select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ---------- Calculadora: preços em destaque ---------- */
+.grade-precos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.preco-destaque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+}
+
+.preco-destaque.principal {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.preco-rotulo {
+  font-size: 13px;
+  color: #475569;
+}
+
+.preco-valor {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.preco-destaque.principal .preco-valor {
+  color: #1d4ed8;
+}
+
+/* ---------- Calculadora: linha de configuração de taxa ---------- */
+.linha-taxa {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.linha-taxa-nome {
+  font-weight: 600;
+  min-width: 120px;
+  align-self: center;
+}
+
+.mensagem-sucesso {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 10px 14px;
+  border-radius: 5px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* ---------- Formulários ---------- */
+.cartao {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo label {
+  font-size: 13px;
+  color: #475569;
+}
+
+.campo input {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.acoes-formulario {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- Barra do topo da seção ---------- */
+.barra-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Badges e mensagens ---------- */
+.badge-estoque-baixo {
+  display: inline-block;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.mensagem-erro {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 5px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* ---------- Modal ---------- */
+.fundo-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.caixa-modal {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.caixa-modal h2 {
+  margin-top: 0;
+}
+
+/* ---------- Responsivo: menu vira topo em telas < 700px ---------- */
+@media (max-width: 700px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .menu-lateral {
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  .menu-lateral .logo {
+    padding: 0 16px 12px;
+  }
+
+  .menu-lateral nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .link-menu {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: 10px 14px;
+  }
+
+  .link-menu.ativo {
+    border-left: none;
+    border-bottom-color: #3b82f6;
+  }
+
+  .conteudo {
+    padding: 18px 16px;
+  }
+}
+
+/* ---------- Dashboard: filtro de período ---------- */
+.filtro-periodo {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.atalhos-periodo {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Dashboard: cards ---------- */
+.cards-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.card-rotulo {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.card-valor {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.card-valor.positivo {
+  color: #16a34a;
+}
+
+.card-valor.negativo {
+  color: #dc2626;
+}

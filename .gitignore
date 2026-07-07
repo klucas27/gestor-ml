@@ -1,1 +1,36 @@
+# ---- Dependências (instaláveis com npm install) ----
+node_modules/
+
+# ---- Variáveis de ambiente (contém a senha do banco) ----
 .env
+*.env
+!.env.exemplo
+
+# ---- Build do front-end (gerado por npm run build) ----
+frontend/dist/
+dist/
+dist-ssr/
+*.local
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---- Arquivos do sistema operacional ----
+.DS_Store
+Thumbs.db
+
+# ---- Editores / IDEs ----
+.vscode/
+.idea/
+*.swp
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ---- Claude Code (worktrees temporárias) ----
+.claude/worktrees/
