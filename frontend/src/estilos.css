@@ -1,6 +1,63 @@
-/* estilos.css — estilo único e simples do GestorML */
+/* estilos.css — sistema de estilo do GestorML
 
-/* ---------- Base ---------- */
+   Organização:
+   1. Tokens (variáveis de cor, raio, sombra)
+   2. Base e tipografia
+   3. Layout (app, menu lateral, conteúdo)
+   4. Componentes (cartão, tabela, botão, campo, chip, badge, mensagens…)
+   5. Telas específicas (dashboard, calculadora, registrar venda)
+   6. Estados (esqueleto de carregamento, vazio)
+   7. Responsivo e acessibilidade (movimento reduzido)
+*/
+
+/* ---------- 1. Tokens ---------- */
+:root {
+  /* Neutros com leve tom esverdeado (identidade "dinheiro/lucro") */
+  --cor-fundo: #f4f6f5;
+  --cor-superficie: #ffffff;
+  --cor-texto: #1b2420;
+  --cor-texto-suave: #55625c;
+  --cor-borda: #e2e8e5;
+  --cor-borda-input: #c4cfc9;
+
+  /* Acento: verde-azulado de confiança (ações primárias e seleção) */
+  --cor-acento: #0f766e;
+  --cor-acento-hover: #0c5f58;
+  --cor-acento-ativo: #0a4f4a;
+  --cor-acento-tinta: #e9f4f2;
+
+  /* Menu lateral (camada neutra escura) */
+  --cor-menu: #14231e;
+  --cor-menu-texto: #b9c8c1;
+
+  /* Semânticas */
+  --cor-sucesso: #166534;
+  --cor-sucesso-fundo: #e7f4eb;
+  --cor-sucesso-borda: #c7e5d1;
+  --cor-perigo: #b42318;
+  --cor-perigo-fundo: #fdecea;
+  --cor-perigo-borda: #f6cfca;
+  --cor-lucro-positivo: #15803d;
+  --cor-lucro-negativo: #b42318;
+
+  /* Canais de venda */
+  --chip-shopee-fundo: #fdeee4;
+  --chip-shopee-texto: #9a3b12;
+  --chip-ml-fundo: #faf3d7;
+  --chip-ml-texto: #6d5a0a;
+
+  /* Forma e foco */
+  --raio-controle: 8px;
+  --raio-cartao: 12px;
+  --anel-foco: 0 0 0 3px rgba(15, 118, 110, 0.25);
+  --transicao: 150ms ease-out;
+
+  /* Camadas */
+  --z-menu-fixo: 5;
+  --z-modal: 10;
+}
+
+/* ---------- 2. Base e tipografia ---------- */
 * {
   box-sizing: border-box;
 }
@@ -8,152 +65,287 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  color: #1f2937;
-  background: #f4f6f8;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
 }
 
 h1 {
-  margin: 0 0 20px;
-  font-size: 24px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 h2 {
-  font-size: 18px;
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 650;
 }
 
-/* ---------- Layout geral ---------- */
+/* Números alinhados em colunas (valores monetários, estoque…) */
+.num,
+.card-valor,
+.preco-valor,
+.tabela td.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 3. Layout ---------- */
 .app {
   display: flex;
   min-height: 100vh;
 }
 
-/* ---------- Menu lateral ---------- */
+/* Menu lateral */
 .menu-lateral {
-  width: 220px;
+  width: 232px;
   flex-shrink: 0;
-  background: #1e293b;
-  color: #e2e8f0;
-  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--cor-menu);
+  color: var(--cor-menu-texto);
+  padding: 20px 0 16px;
 }
 
 .menu-lateral .logo {
-  font-size: 20px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 18px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logo-marca {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--cor-acento);
   color: #ffffff;
-  padding: 0 20px 20px;
-  border-bottom: 1px solid #334155;
-  margin-bottom: 12px;
+}
+
+.logo-nome {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.logo-descricao {
+  font-size: 11.5px;
+  color: var(--cor-menu-texto);
 }
 
 .menu-lateral nav {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+  flex: 1;
 }
 
 .link-menu {
-  display: block;
-  padding: 12px 20px;
-  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--raio-controle);
+  color: var(--cor-menu-texto);
   text-decoration: none;
-  font-size: 15px;
-  border-left: 3px solid transparent;
+  font-size: 14.5px;
+  transition: background-color var(--transicao), color var(--transicao);
+}
+
+.link-menu svg {
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 .link-menu:hover {
-  background: #334155;
+  background: rgba(255, 255, 255, 0.07);
   color: #ffffff;
+}
+
+.link-menu:focus-visible {
+  outline: none;
+  box-shadow: var(--anel-foco);
 }
 
 .link-menu.ativo {
-  background: #0f172a;
+  background: var(--cor-acento);
   color: #ffffff;
-  border-left-color: #3b82f6;
   font-weight: 600;
 }
 
-/* ---------- Conteúdo ---------- */
+.link-menu.ativo svg {
+  opacity: 1;
+}
+
+.menu-rodape {
+  padding: 14px 22px 0;
+  font-size: 11.5px;
+  color: rgba(185, 200, 193, 0.6);
+}
+
+/* Conteúdo */
 .conteudo {
   flex: 1;
-  padding: 28px 32px;
+  padding: 28px 32px 48px;
   min-width: 0;
+  max-width: 1120px;
+}
+
+/* Cabeçalho de página: título + frase que explica a tela */
+.cabecalho-pagina {
+  margin-bottom: 22px;
+}
+
+.cabecalho-pagina p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--cor-texto-suave);
 }
 
 .aviso-vazio {
-  color: #6b7280;
+  color: var(--cor-texto-suave);
+  font-size: 14px;
 }
 
-/* ---------- Tabelas ---------- */
+/* ---------- 4. Componentes ---------- */
+
+/* Cartão */
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-cartao);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Tabela */
+.tabela-rolante {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-cartao);
+}
+
 .tabela {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
 }
 
 .tabela th,
 .tabela td {
-  padding: 10px 12px;
+  padding: 11px 14px;
   text-align: left;
   font-size: 14px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--cor-borda);
 }
 
 .tabela th {
-  background: #f1f5f9;
-  color: #334155;
+  background: #f7faf8;
+  color: var(--cor-texto-suave);
   font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
-.tabela tbody tr:nth-child(even) {
-  background: #f9fafb;
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela tbody tr {
+  transition: background-color var(--transicao);
 }
 
 .tabela tbody tr:hover {
-  background: #eef2ff;
+  background: #f2f7f5;
 }
 
-/* Faz a tabela rolar horizontalmente em telas estreitas */
-.tabela-rolante {
-  width: 100%;
-  overflow-x: auto;
+/* Colunas numéricas alinhadas à direita */
+.tabela th.num,
+.tabela td.num {
+  text-align: right;
 }
 
-/* ---------- Botões ---------- */
+/* Botões */
 .botao {
-  display: inline-block;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 5px;
-  background: #3b82f6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--raio-controle);
+  background: var(--cor-acento);
   color: #ffffff;
   font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
+  transition: background-color var(--transicao), border-color var(--transicao),
+    color var(--transicao), box-shadow var(--transicao);
 }
 
 .botao:hover {
-  background: #2563eb;
+  background: var(--cor-acento-hover);
 }
 
+.botao:active {
+  background: var(--cor-acento-ativo);
+}
+
+.botao:focus-visible {
+  outline: none;
+  box-shadow: var(--anel-foco);
+}
+
+.botao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Secundário: neutro com contorno */
 .botao.secundario {
-  background: #64748b;
+  background: var(--cor-superficie);
+  border-color: var(--cor-borda-input);
+  color: var(--cor-texto);
+  font-weight: 500;
 }
 
 .botao.secundario:hover {
-  background: #475569;
+  background: #f2f6f4;
+  border-color: #a9b8b1;
 }
 
+.botao.secundario:active {
+  background: #e8efec;
+}
+
+/* Perigo: discreto (fundo tingido), pois é ação destrutiva secundária */
 .botao.perigo {
-  background: #dc2626;
+  background: var(--cor-perigo-fundo);
+  border-color: var(--cor-perigo-borda);
+  color: var(--cor-perigo);
 }
 
 .botao.perigo:hover {
-  background: #b91c1c;
+  background: #fbdcd8;
+  border-color: #eeb4ac;
 }
 
 .botao.pequeno {
-  padding: 5px 10px;
+  height: 30px;
+  padding: 0 10px;
   font-size: 13px;
 }
 
@@ -162,222 +354,173 @@ h2 {
   gap: 6px;
 }
 
-/* ---------- Select (mesmo visual dos inputs) ---------- */
-.campo select {
-  padding: 8px 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
-  font-size: 14px;
-  background: #ffffff;
-}
-
-.campo select:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-/* ---------- Calculadora: preços em destaque ---------- */
-.grade-precos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.preco-destaque {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #f9fafb;
-}
-
-.preco-destaque.principal {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-}
-
-.preco-rotulo {
-  font-size: 13px;
-  color: #475569;
-}
-
-.preco-valor {
-  font-size: 26px;
-  font-weight: bold;
-  color: #1e293b;
-}
-
-.preco-destaque.principal .preco-valor {
-  color: #1d4ed8;
-}
-
-/* ---------- Calculadora: linha de configuração de taxa ---------- */
-.linha-taxa {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 12px 0;
-  border-top: 1px solid #e5e7eb;
-}
-
-.linha-taxa-nome {
-  font-weight: 600;
-  min-width: 120px;
-  align-self: center;
-}
-
-.mensagem-sucesso {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  padding: 10px 14px;
-  border-radius: 5px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-/* ---------- Formulários ---------- */
-.cartao {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
+/* Campos de formulário (input e select com o mesmo visual) */
 .formulario {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .campo label {
   font-size: 13px;
-  color: #475569;
+  font-weight: 500;
+  color: var(--cor-texto-suave);
 }
 
-.campo input {
-  padding: 8px 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
+.campo input,
+.campo select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--cor-borda-input);
+  border-radius: var(--raio-controle);
   font-size: 14px;
+  font-family: inherit;
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
+  transition: border-color var(--transicao), box-shadow var(--transicao);
 }
 
-.campo input:focus {
+.campo input:focus,
+.campo select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--cor-acento);
+  box-shadow: var(--anel-foco);
+}
+
+.campo input::placeholder {
+  color: #7d8a84;
 }
 
 .acoes-formulario {
   grid-column: 1 / -1;
   display: flex;
   gap: 10px;
+  margin-top: 4px;
 }
 
-/* ---------- Barra do topo da seção ---------- */
+/* Barra do topo da seção (título + ação principal) */
 .barra-topo {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  margin-bottom: 22px;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-/* ---------- Badges e mensagens ---------- */
-.badge-estoque-baixo {
+.barra-topo .cabecalho-pagina {
+  margin-bottom: 0;
+}
+
+/* Chips de canal (Shopee / Mercado Livre) */
+.chip-canal {
   display: inline-block;
-  background: #dc2626;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
-.mensagem-erro {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-  padding: 10px 14px;
-  border-radius: 5px;
+.chip-canal.shopee {
+  background: var(--chip-shopee-fundo);
+  color: var(--chip-shopee-texto);
+}
+
+.chip-canal.mercado_livre {
+  background: var(--chip-ml-fundo);
+  color: var(--chip-ml-texto);
+}
+
+/* Badge de estoque baixo */
+.badge-estoque-baixo {
+  display: inline-block;
+  margin-left: 6px;
+  background: var(--cor-perigo-fundo);
+  color: var(--cor-perigo);
+  border: 1px solid var(--cor-perigo-borda);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Mensagens de feedback */
+.mensagem-erro,
+.mensagem-sucesso {
+  padding: 11px 14px;
+  border-radius: var(--raio-controle);
   margin-bottom: 16px;
   font-size: 14px;
 }
 
-/* ---------- Modal ---------- */
+.mensagem-sucesso {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso);
+  border: 1px solid var(--cor-sucesso-borda);
+}
+
+.mensagem-erro {
+  background: var(--cor-perigo-fundo);
+  color: var(--cor-perigo);
+  border: 1px solid var(--cor-perigo-borda);
+}
+
+/* Modal */
 .fundo-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(13, 22, 18, 0.5);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 40px 16px;
+  padding: 48px 16px;
   overflow-y: auto;
-  z-index: 10;
+  z-index: var(--z-modal);
+  animation: aparecer 150ms ease-out;
 }
 
 .caixa-modal {
-  background: #ffffff;
-  border-radius: 8px;
+  background: var(--cor-superficie);
+  border-radius: 14px;
   padding: 24px;
   width: 100%;
   max-width: 560px;
+  box-shadow: 0 24px 48px -24px rgba(13, 22, 18, 0.4);
+  animation: subir 180ms ease-out;
 }
 
 .caixa-modal h2 {
   margin-top: 0;
+  font-size: 18px;
 }
 
-/* ---------- Responsivo: menu vira topo em telas < 700px ---------- */
-@media (max-width: 700px) {
-  .app {
-    flex-direction: column;
-  }
+@keyframes aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  .menu-lateral {
-    width: 100%;
-    padding: 12px 0;
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  .menu-lateral .logo {
-    padding: 0 16px 12px;
-  }
-
-  .menu-lateral nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .link-menu {
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    padding: 10px 14px;
-  }
-
-  .link-menu.ativo {
-    border-left: none;
-    border-bottom-color: #3b82f6;
-  }
-
-  .conteudo {
-    padding: 18px 16px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* ---------- Dashboard: filtro de período ---------- */
+/* ---------- 5. Telas específicas ---------- */
+
+/* Dashboard: filtro de período */
 .filtro-periodo {
   display: flex;
   align-items: flex-end;
@@ -391,39 +534,276 @@ h2 {
   flex-wrap: wrap;
 }
 
-/* ---------- Dashboard: cards ---------- */
+/* Dashboard: cartões de indicadores */
 .cards-grade {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  gap: 6px;
+  padding: 18px 20px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-cartao);
 }
 
 .card-rotulo {
   font-size: 13px;
-  color: #64748b;
+  font-weight: 500;
+  color: var(--cor-texto-suave);
 }
 
 .card-valor {
-  font-size: 28px;
-  font-weight: bold;
-  color: #1e293b;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cor-texto);
 }
 
 .card-valor.positivo {
-  color: #16a34a;
+  color: var(--cor-lucro-positivo);
 }
 
 .card-valor.negativo {
-  color: #dc2626;
+  color: var(--cor-lucro-negativo);
+}
+
+/* Histórico: cor do lucro e resumo do filtro */
+.lucro-positivo {
+  color: var(--cor-lucro-positivo);
+  font-weight: 600;
+}
+
+.lucro-negativo {
+  color: var(--cor-lucro-negativo);
+  font-weight: 600;
+}
+
+.resumo-filtro {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--cor-texto-suave);
+}
+
+.resumo-filtro strong {
+  color: var(--cor-texto);
+}
+
+/* Calculadora: preços em destaque */
+.grade-precos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.preco-destaque {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-cartao);
+  background: #f7faf8;
+}
+
+.preco-destaque.principal {
+  background: var(--cor-acento-tinta);
+  border-color: #bcdcd7;
+}
+
+.preco-rotulo {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cor-texto-suave);
+}
+
+.preco-valor {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cor-texto);
+}
+
+.preco-destaque.principal .preco-valor {
+  color: var(--cor-acento);
+}
+
+/* Calculadora: linha de configuração de taxa */
+.linha-taxa {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-top: 1px solid var(--cor-borda);
+}
+
+.linha-taxa-nome {
+  font-weight: 600;
+  min-width: 120px;
+  align-self: center;
+}
+
+/* Registrar venda: formulário + resumo lado a lado */
+.duas-colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.resumo-venda {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resumo-venda h2 {
+  margin-bottom: 4px;
+}
+
+.linha-resumo {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--cor-texto-suave);
+}
+
+.linha-resumo .num {
+  color: var(--cor-texto);
+  font-weight: 500;
+}
+
+.linha-resumo.destaque {
+  padding-top: 10px;
+  border-top: 1px solid var(--cor-borda);
+  font-weight: 600;
+  color: var(--cor-texto);
+}
+
+.linha-resumo.destaque .num {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ---------- 6. Estados: carregando e vazio ---------- */
+
+/* Esqueleto de carregamento (no lugar de "Carregando…") */
+.esqueleto {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e6ece9 25%, #f2f6f4 40%, #e6ece9 55%);
+  background-size: 400% 100%;
+  animation: brilho 1.3s ease-in-out infinite;
+}
+
+@keyframes brilho {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+/* Estado vazio que ensina o próximo passo */
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-cartao);
+}
+
+.estado-vazio-icone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  border-radius: 999px;
+  background: var(--cor-acento-tinta);
+  color: var(--cor-acento);
+}
+
+.estado-vazio h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.estado-vazio p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 14px;
+  color: var(--cor-texto-suave);
+}
+
+.estado-vazio .botao {
+  margin-top: 12px;
+}
+
+/* ---------- 7. Responsivo e acessibilidade ---------- */
+
+/* Menu vira barra no topo em telas estreitas */
+@media (max-width: 700px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .menu-lateral {
+    width: 100%;
+    padding: 12px 0 10px;
+  }
+
+  .menu-lateral .logo {
+    padding: 0 16px 12px;
+  }
+
+  .menu-lateral nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .link-menu {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .menu-rodape {
+    display: none;
+  }
+
+  .conteudo {
+    padding: 20px 16px 40px;
+  }
+
+  .duas-colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Movimento reduzido: remove animações, mantém o estado final */
+@media (prefers-reduced-motion: reduce) {
+  .fundo-modal,
+  .caixa-modal {
+    animation: none;
+  }
+
+  .esqueleto {
+    animation: none;
+    background: #e6ece9;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

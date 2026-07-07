@@ -5,6 +5,7 @@ import {
   editarProduto,
   excluirProduto,
 } from '../api.js'
+import Icone from '../icones.jsx'
 
 // Estado inicial vazio do formulário
 const FORM_VAZIO = {
@@ -21,6 +22,21 @@ const FORM_VAZIO = {
 function formatarPreco(valor) {
   if (valor === null || valor === undefined || valor === '') return '—'
   return `R$ ${Number(valor).toFixed(2).replace('.', ',')}`
+}
+
+// Esqueleto da tabela enquanto a lista carrega
+function EsqueletoTabela() {
+  return (
+    <div className="cartao">
+      {[0, 1, 2, 3].map((i) => (
+        <span
+          key={i}
+          className="esqueleto"
+          style={{ height: 20, marginBottom: i < 3 ? 14 : 0 }}
+        />
+      ))}
+    </div>
+  )
 }
 
 export default function Produtos() {
@@ -51,6 +67,16 @@ export default function Produtos() {
   useEffect(() => {
     carregar()
   }, [])
+
+  // Fecha o modal com a tecla Escape
+  useEffect(() => {
+    if (!modalAberto) return
+    function aoTeclar(evento) {
+      if (evento.key === 'Escape') fecharModal()
+    }
+    window.addEventListener('keydown', aoTeclar)
+    return () => window.removeEventListener('keydown', aoTeclar)
+  }, [modalAberto])
 
   // Abre o modal para criar um novo produto
   function abrirNovo() {
@@ -142,7 +168,10 @@ export default function Produtos() {
   return (
     <div>
       <div className="barra-topo">
-        <h1>Produtos</h1>
+        <header className="cabecalho-pagina">
+          <h1>Produtos</h1>
+          <p>Cadastro, custos, preços por canal e controle de estoque.</p>
+        </header>
         <button type="button" className="botao" onClick={abrirNovo}>
           + Novo produto
         </button>
@@ -152,9 +181,21 @@ export default function Produtos() {
       {erro && !modalAberto && <div className="mensagem-erro">{erro}</div>}
 
       {carregando ? (
-        <p>Carregando…</p>
+        <EsqueletoTabela />
       ) : produtos.length === 0 ? (
-        <p className="aviso-vazio">Nenhum produto cadastrado ainda.</p>
+        <div className="estado-vazio">
+          <span className="estado-vazio-icone">
+            <Icone nome="produtos" tamanho={20} />
+          </span>
+          <h3>Nenhum produto cadastrado</h3>
+          <p>
+            Cadastre o primeiro produto com custo e preços para começar a
+            registrar vendas e calcular o lucro.
+          </p>
+          <button type="button" className="botao" onClick={abrirNovo}>
+            Cadastrar primeiro produto
+          </button>
+        </div>
       ) : (
         <div className="tabela-rolante">
           <table className="tabela">
@@ -162,11 +203,11 @@ export default function Produtos() {
               <tr>
                 <th>Nome</th>
                 <th>SKU</th>
-                <th>Custo</th>
-                <th>Preço Shopee</th>
-                <th>Preço ML</th>
-                <th>Estoque</th>
-                <th>Estoque mín.</th>
+                <th className="num">Custo</th>
+                <th className="num">Preço Shopee</th>
+                <th className="num">Preço ML</th>
+                <th className="num">Estoque</th>
+                <th className="num">Estoque mín.</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -174,17 +215,17 @@ export default function Produtos() {
               {produtos.map((p) => (
                 <tr key={p.id}>
                   <td>
-                    {p.nome}{' '}
+                    {p.nome}
                     {p.estoque_baixo && (
-                      <span className="badge-estoque-baixo">ESTOQUE BAIXO</span>
+                      <span className="badge-estoque-baixo">Estoque baixo</span>
                     )}
                   </td>
                   <td>{p.sku || '—'}</td>
-                  <td>{formatarPreco(p.custo)}</td>
-                  <td>{formatarPreco(p.preco_shopee)}</td>
-                  <td>{formatarPreco(p.preco_ml)}</td>
-                  <td>{p.estoque}</td>
-                  <td>{p.estoque_minimo}</td>
+                  <td className="num">{formatarPreco(p.custo)}</td>
+                  <td className="num">{formatarPreco(p.preco_shopee)}</td>
+                  <td className="num">{formatarPreco(p.preco_ml)}</td>
+                  <td className="num">{p.estoque}</td>
+                  <td className="num">{p.estoque_minimo}</td>
                   <td>
                     <div className="acoes-linha">
                       <button
@@ -213,15 +254,22 @@ export default function Produtos() {
       {/* Modal de criar/editar */}
       {modalAberto && (
         <div className="fundo-modal" onClick={fecharModal}>
-          <div className="caixa-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="caixa-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={editandoId ? 'Editar produto' : 'Novo produto'}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2>{editandoId ? 'Editar produto' : 'Novo produto'}</h2>
 
             {erro && <div className="mensagem-erro">{erro}</div>}
 
             <form className="formulario" onSubmit={salvar}>
               <div className="campo">
-                <label>Nome *</label>
+                <label htmlFor="prod-nome">Nome *</label>
                 <input
+                  id="prod-nome"
                   name="nome"
                   value={form.nome}
                   onChange={mudarCampo}
@@ -230,13 +278,19 @@ export default function Produtos() {
               </div>
 
               <div className="campo">
-                <label>SKU (código seu, opcional)</label>
-                <input name="sku" value={form.sku} onChange={mudarCampo} />
+                <label htmlFor="prod-sku">SKU (código seu, opcional)</label>
+                <input
+                  id="prod-sku"
+                  name="sku"
+                  value={form.sku}
+                  onChange={mudarCampo}
+                />
               </div>
 
               <div className="campo">
-                <label>Custo *</label>
+                <label htmlFor="prod-custo">Custo *</label>
                 <input
+                  id="prod-custo"
                   name="custo"
                   type="number"
                   step="0.01"
@@ -247,8 +301,9 @@ export default function Produtos() {
               </div>
 
               <div className="campo">
-                <label>Preço Shopee</label>
+                <label htmlFor="prod-preco-shopee">Preço Shopee</label>
                 <input
+                  id="prod-preco-shopee"
                   name="preco_shopee"
                   type="number"
                   step="0.01"
@@ -259,8 +314,9 @@ export default function Produtos() {
               </div>
 
               <div className="campo">
-                <label>Preço Mercado Livre</label>
+                <label htmlFor="prod-preco-ml">Preço Mercado Livre</label>
                 <input
+                  id="prod-preco-ml"
                   name="preco_ml"
                   type="number"
                   step="0.01"
@@ -271,8 +327,9 @@ export default function Produtos() {
               </div>
 
               <div className="campo">
-                <label>Estoque</label>
+                <label htmlFor="prod-estoque">Estoque</label>
                 <input
+                  id="prod-estoque"
                   name="estoque"
                   type="number"
                   min="0"
@@ -282,8 +339,9 @@ export default function Produtos() {
               </div>
 
               <div className="campo">
-                <label>Estoque mínimo</label>
+                <label htmlFor="prod-estoque-min">Estoque mínimo</label>
                 <input
+                  id="prod-estoque-min"
                   name="estoque_minimo"
                   type="number"
                   min="0"

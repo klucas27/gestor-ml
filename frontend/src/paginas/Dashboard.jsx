@@ -12,6 +12,7 @@ import {
   Legend,
 } from 'recharts'
 import { obterDashboard } from '../api.js'
+import Icone from '../icones.jsx'
 
 // Formatação de moeda em Real brasileiro
 const moeda = new Intl.NumberFormat('pt-BR', {
@@ -24,6 +25,12 @@ const NOME_CANAL = {
   shopee: 'Shopee',
   mercado_livre: 'Mercado Livre',
 }
+
+// Cores dos gráficos (alinhadas aos tokens do estilos.css)
+const COR_ACENTO = '#0f766e' // lucro / série principal
+const COR_APOIO = '#9db8b2' // faturamento (série de contexto)
+const COR_GRADE = '#e2e8e5'
+const COR_EIXO = '#55625c'
 
 // Converte Date para string yyyy-mm-dd (formato aceito pelo input date e pela API)
 function paraISO(data) {
@@ -46,6 +53,26 @@ function periodoEsteMes() {
   const hoje = new Date()
   const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
   return { inicio: paraISO(inicio), fim: paraISO(hoje) }
+}
+
+// Esqueleto exibido enquanto os dados carregam (evita "pulo" de layout)
+function EsqueletoDashboard() {
+  return (
+    <>
+      <div className="cards-grade">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="card">
+            <span className="esqueleto" style={{ width: '55%', height: 13 }} />
+            <span className="esqueleto" style={{ width: '75%', height: 28 }} />
+          </div>
+        ))}
+      </div>
+      <div className="cartao">
+        <span className="esqueleto" style={{ width: 240, height: 16, marginBottom: 16 }} />
+        <span className="esqueleto" style={{ width: '100%', height: 260 }} />
+      </div>
+    </>
+  )
 }
 
 export default function Dashboard() {
@@ -116,22 +143,27 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1>Dashboard</h1>
+      <header className="cabecalho-pagina">
+        <h1>Dashboard</h1>
+        <p>Resumo do faturamento, lucro e produtos mais vendidos no período.</p>
+      </header>
 
       {/* ---------- Filtro de período ---------- */}
       <div className="cartao">
         <div className="filtro-periodo">
           <div className="campo">
-            <label>Início</label>
+            <label htmlFor="dash-inicio">Início</label>
             <input
+              id="dash-inicio"
               type="date"
               value={inicio}
               onChange={(e) => setInicio(e.target.value)}
             />
           </div>
           <div className="campo">
-            <label>Fim</label>
+            <label htmlFor="dash-fim">Fim</label>
             <input
+              id="dash-fim"
               type="date"
               value={fim}
               onChange={(e) => setFim(e.target.value)}
@@ -166,12 +198,16 @@ export default function Dashboard() {
       {erro && <div className="mensagem-erro">{erro}</div>}
 
       {carregando ? (
-        <p>Carregando…</p>
+        <EsqueletoDashboard />
       ) : semVendas ? (
-        <div className="cartao">
-          <p className="aviso-vazio">
-            Nenhuma venda registrada neste período. Ajuste o filtro ou registre
-            uma venda para ver os indicadores.
+        <div className="estado-vazio">
+          <span className="estado-vazio-icone">
+            <Icone nome="dashboard" tamanho={20} />
+          </span>
+          <h3>Nenhuma venda neste período</h3>
+          <p>
+            Ajuste o filtro de datas acima ou registre a primeira venda para
+            ver os indicadores.
           </p>
         </div>
       ) : (
@@ -214,13 +250,32 @@ export default function Dashboard() {
               <h2>Faturamento e lucro por canal</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={dadosCanais}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="canal" />
-                  <YAxis />
+                  <CartesianGrid stroke={COR_GRADE} vertical={false} />
+                  <XAxis
+                    dataKey="canal"
+                    tick={{ fill: COR_EIXO, fontSize: 12 }}
+                    axisLine={{ stroke: COR_GRADE }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: COR_EIXO, fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip formatter={(v) => moeda.format(v)} />
                   <Legend />
-                  <Bar dataKey="faturamento" name="Faturamento" fill="#3b82f6" />
-                  <Bar dataKey="lucro" name="Lucro" fill="#16a34a" />
+                  <Bar
+                    dataKey="faturamento"
+                    name="Faturamento"
+                    fill={COR_APOIO}
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="lucro"
+                    name="Lucro"
+                    fill={COR_ACENTO}
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -230,16 +285,27 @@ export default function Dashboard() {
               <h2>Faturamento por dia</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={dadosDias}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="dia" />
-                  <YAxis />
+                  <CartesianGrid stroke={COR_GRADE} vertical={false} />
+                  <XAxis
+                    dataKey="dia"
+                    tick={{ fill: COR_EIXO, fontSize: 12 }}
+                    axisLine={{ stroke: COR_GRADE }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: COR_EIXO, fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip formatter={(v) => moeda.format(v)} />
                   <Line
                     type="monotone"
                     dataKey="faturamento"
                     name="Faturamento"
-                    stroke="#3b82f6"
+                    stroke={COR_ACENTO}
                     strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -251,21 +317,21 @@ export default function Dashboard() {
               {topProdutos.length === 0 ? (
                 <p className="aviso-vazio">Sem dados de produtos no período.</p>
               ) : (
-                <div className="tabela-rolante">
+                <div className="tabela-rolante" style={{ border: 'none' }}>
                   <table className="tabela">
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>Produto</th>
-                        <th>Quantidade vendida</th>
+                        <th className="num">Quantidade vendida</th>
                       </tr>
                     </thead>
                     <tbody>
                       {topProdutos.map((p, indice) => (
                         <tr key={p.nome}>
-                          <td>{indice + 1}</td>
+                          <td className="num">{indice + 1}</td>
                           <td>{p.nome}</td>
-                          <td>{Number(p.quantidade_total)}</td>
+                          <td className="num">{Number(p.quantidade_total)}</td>
                         </tr>
                       ))}
                     </tbody>

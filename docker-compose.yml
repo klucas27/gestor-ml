@@ -1,0 +1,35 @@
+# docker-compose.yml — banco PostgreSQL do GestorML
+# Sobe um Postgres já com o banco "gestorml" criado e as tabelas carregadas.
+# Uso:
+#   docker compose up -d      (liga o banco em segundo plano)
+#   docker compose down       (desliga)
+#   docker compose down -v     (desliga e APAGA os dados)
+#
+# Observação: usamos network_mode: host porque este kernel não tem o módulo
+# de iptables (nf_tables/DNAT) que o Docker precisa para publicar portas.
+# Com host, o Postgres escuta direto em localhost:5432 do computador.
+services:
+  db:
+    image: postgres:16
+    container_name: gestorml_db
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      POSTGRES_USER: lucas
+      POSTGRES_PASSWORD: gestor123
+      POSTGRES_DB: gestorml
+    volumes:
+      # Dados persistem entre reinícios
+      - gestorml_dados:/var/lib/postgresql/data
+      # Scripts rodam automaticamente na PRIMEIRA vez (banco vazio),
+      # em ordem alfabética: primeiro a estrutura, depois os dados de exemplo.
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lucas -d gestorml"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  gestorml_dados:

@@ -154,7 +154,13 @@ export default function Calculadora() {
 
   return (
     <div>
-      <h1>Calculadora de Preço</h1>
+      <header className="cabecalho-pagina">
+        <h1>Calculadora de Preço</h1>
+        <p>
+          Descubra por quanto anunciar para não ter prejuízo e atingir a margem
+          desejada.
+        </p>
+      </header>
 
       {erro && <div className="mensagem-erro">{erro}</div>}
 
@@ -162,8 +168,9 @@ export default function Calculadora() {
       <div className="cartao">
         <div className="formulario">
           <div className="campo">
-            <label>Custo do produto (R$)</label>
+            <label htmlFor="calc-custo">Custo do produto (R$)</label>
             <input
+              id="calc-custo"
               type="number"
               step="0.01"
               min="0"
@@ -173,8 +180,9 @@ export default function Calculadora() {
           </div>
 
           <div className="campo">
-            <label>Frete pago pelo vendedor (R$)</label>
+            <label htmlFor="calc-frete">Frete pago pelo vendedor (R$)</label>
             <input
+              id="calc-frete"
               type="number"
               step="0.01"
               min="0"
@@ -184,8 +192,9 @@ export default function Calculadora() {
           </div>
 
           <div className="campo">
-            <label>Margem de lucro desejada (%)</label>
+            <label htmlFor="calc-margem">Margem de lucro desejada (%)</label>
             <input
+              id="calc-margem"
               type="number"
               step="0.01"
               min="0"
@@ -195,8 +204,12 @@ export default function Calculadora() {
           </div>
 
           <div className="campo">
-            <label>Canal</label>
-            <select value={canal} onChange={(e) => setCanal(e.target.value)}>
+            <label htmlFor="calc-canal">Canal</label>
+            <select
+              id="calc-canal"
+              value={canal}
+              onChange={(e) => setCanal(e.target.value)}
+            >
               {CANAIS.map((c) => (
                 <option key={c.valor} value={c.valor}>
                   {c.rotulo}
@@ -207,7 +220,7 @@ export default function Calculadora() {
         </div>
 
         {taxaCanal && (
-          <p className="aviso-vazio">
+          <p className="aviso-vazio" style={{ marginTop: 14, marginBottom: 0 }}>
             Taxa atual do canal: {Number(taxaCanal.percentual)}% +{' '}
             {reais(taxaCanal.taxa_fixa)} por venda.
           </p>
@@ -247,33 +260,35 @@ export default function Calculadora() {
           )}
 
           {resultado.sugeridoPossivel && (
-            <div className="tabela-rolante">
+            <div className="tabela-rolante" style={{ border: 'none' }}>
               <table className="tabela">
                 <thead>
                   <tr>
                     <th>Item (no preço sugerido)</th>
-                    <th>Valor</th>
+                    <th className="num">Valor</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>Custo do produto</td>
-                    <td>{reais(custo || 0)}</td>
+                    <td className="num">{reais(custo || 0)}</td>
                   </tr>
                   <tr>
                     <td>Frete</td>
-                    <td>{reais(frete || 0)}</td>
+                    <td className="num">{reais(frete || 0)}</td>
                   </tr>
                   <tr>
                     <td>Taxa do marketplace</td>
-                    <td>{reais(resultado.taxaMarketplaceReais)}</td>
+                    <td className="num">{reais(resultado.taxaMarketplaceReais)}</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Lucro por venda</strong>
                     </td>
-                    <td>
-                      <strong>{reais(resultado.lucro)}</strong>
+                    <td className="num">
+                      <strong className="lucro-positivo">
+                        {reais(resultado.lucro)}
+                      </strong>
                     </td>
                   </tr>
                 </tbody>
@@ -299,8 +314,9 @@ export default function Calculadora() {
             <div key={c.valor} className="linha-taxa">
               <span className="linha-taxa-nome">{c.rotulo}</span>
               <div className="campo">
-                <label>Percentual (%)</label>
+                <label htmlFor={`taxa-perc-${c.valor}`}>Percentual (%)</label>
                 <input
+                  id={`taxa-perc-${c.valor}`}
                   type="number"
                   step="0.01"
                   min="0"
@@ -311,8 +327,9 @@ export default function Calculadora() {
                 />
               </div>
               <div className="campo">
-                <label>Taxa fixa (R$)</label>
+                <label htmlFor={`taxa-fixa-${c.valor}`}>Taxa fixa (R$)</label>
                 <input
+                  id={`taxa-fixa-${c.valor}`}
                   type="number"
                   step="0.01"
                   min="0"

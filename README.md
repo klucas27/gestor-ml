@@ -20,15 +20,42 @@ resolver um problema real de um pequeno empreendedor da comunidade, alinhado aos
 
 ## Prints das telas
 
-> _(Substituir pelos prints reais depois de rodar o sistema.)_
+| Dashboard | Produtos |
+|---|---|
+| ![Dashboard](docs/print-dashboard.png) | ![Produtos](docs/print-produtos.png) |
 
-| Tela | Print |
-|------|-------|
-| Dashboard (indicadores e gráficos) | `docs/print-dashboard.png` |
-| Produtos (cadastro e estoque) | `docs/print-produtos.png` |
-| Calculadora de preço | `docs/print-calculadora.png` |
-| Registrar venda | `docs/print-registrar-venda.png` |
-| Histórico de vendas | `docs/print-historico.png` |
+| Calculadora de preço | Registrar venda |
+|---|---|
+| ![Calculadora](docs/print-calculadora.png) | ![Registrar venda](docs/print-registrar-venda.png) |
+
+| Histórico de vendas |
+|---|
+| ![Histórico](docs/print-historico.png) |
+
+## Design e interface (UI/UX)
+
+A interface foi desenhada para um vendedor **não-técnico**, com identidade
+própria em torno de **dinheiro/lucro** (neutros esverdeados + acento
+verde-azulado `#0f766e`). Os principais cuidados:
+
+- **Design tokens:** todas as cores, raios e transições são variáveis CSS em
+  `frontend/src/estilos.css` — mudar o visual = mudar os tokens.
+- **O lucro é o protagonista:** verde quando positivo, vermelho quando
+  negativo, em cards, tabelas e gráficos.
+- **Resumo ao vivo:** ao registrar uma venda, um painel lateral simula o
+  **lucro estimado** antes de salvar.
+- **Nunca no escuro:** esqueletos de carregamento (shimmer) em vez de
+  "Carregando…", estados vazios que ensinam o próximo passo, mensagens de
+  erro em português claro.
+- **Números tabulares** alinhados à direita, sempre no padrão brasileiro
+  (`R$ 1.234,56`, `dd/mm/aaaa`); chips coloridos identificam Shopee e
+  Mercado Livre no histórico.
+- **Acessibilidade:** contraste WCAG AA, foco visível em todos os controles,
+  modal com Escape/`aria-modal`, animações desligadas com
+  `prefers-reduced-motion`, `<html lang="pt-BR">`.
+
+Detalhes completos do sistema visual em **[DESIGN.md](DESIGN.md)**; contexto de
+produto e princípios em **[PRODUCT.md](PRODUCT.md)**.
 
 ## Tecnologias (stack)
 
@@ -38,7 +65,7 @@ resolver um problema real de um pequeno empreendedor da comunidade, alinhado aos
 | Banco de dados | PostgreSQL (pacote `pg`) |
 | Front-end | React + Vite (JavaScript) |
 | Gráficos | Recharts |
-| Estilo | CSS único, sem framework |
+| Estilo | CSS próprio com design tokens (variáveis CSS), sem framework |
 
 Sem login, sem Docker, sem integração com API dos marketplaces: o estoque é dado
 baixa automaticamente quando o vendedor registra a venda no sistema.
@@ -73,7 +100,25 @@ git clone https://github.com/klucas27/gestor-ml.git
 cd gestor-ml
 ```
 
-### 3. Criar o banco de dados
+### 3. Criar o banco de dados (opção A — Docker, mais fácil)
+
+Se você tem **Docker** instalado, o banco sobe pronto com um comando (já cria o
+banco `gestorml`, as tabelas e os dados de exemplo):
+
+```bash
+docker compose up -d
+```
+
+Isso usa o arquivo `docker-compose.yml` da raiz. Usuário `lucas`, senha
+`gestor123`, banco `gestorml` — exatamente o que está no `backend/.env`.
+Para desligar: `docker compose down` (ou `docker compose down -v` para apagar os
+dados). **Pule para o passo 4.**
+
+> Observação: o `docker-compose.yml` usa `network_mode: host`. Se em algum
+> computador a porta não abrir, é porque falta módulo de rede do Docker no
+> kernel — nesse caso use a opção B abaixo.
+
+### 3. Criar o banco de dados (opção B — PostgreSQL instalado na máquina)
 
 Crie um banco chamado `gestorml` e carregue a estrutura e os dados de exemplo:
 
