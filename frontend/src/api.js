@@ -1,5 +1,8 @@
-// api.js — funções de acesso ao back-end GestorML (http://localhost:3001)
-const BASE = 'http://localhost:3001/api';
+// api.js — funções de acesso ao back-end GestorML
+// Em desenvolvimento (npm run dev) o front roda na porta 5173 e chama o
+// back-end direto em http://localhost:3001. Em produção o Express serve o
+// front e a API no MESMO endereço, então usamos o caminho relativo /api.
+const BASE = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
 
 // Executa o fetch e trata o erro de forma padronizada.
 // Se a resposta não for ok, lança Error com o campo "erro" do JSON.

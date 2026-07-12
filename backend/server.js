@@ -1,5 +1,6 @@
 // server.js — ponto de entrada do back-end GestorML
 require('dotenv').config();
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
@@ -21,11 +22,14 @@ app.use('/api/vendas', vendas);
 app.use('/api/dashboard', dashboard);
 app.use('/api/taxas', taxas);
 
-// ---------- Produção local: servir o front-end já compilado ----------
-// Depois de rodar `npm run build` na pasta frontend, o Express entrega os
-// arquivos de frontend/dist. Assim o vendedor abre tudo em http://localhost:3001
-// sem precisar do servidor de desenvolvimento do Vite.
-const pastaFront = path.join(__dirname, '../frontend/dist');
+// ---------- Produção: servir o front-end já compilado ----------
+// No deploy (alwaysdata) o script de build copia frontend/dist para
+// backend/public, então o back-end é autossuficiente. Rodando localmente
+// sem essa pasta, cai no frontend/dist como antes.
+const pastaPublic = path.join(__dirname, 'public');
+const pastaFront = fs.existsSync(pastaPublic)
+  ? pastaPublic
+  : path.join(__dirname, '../frontend/dist');
 app.use(express.static(pastaFront));
 
 // Qualquer rota que NÃO seja /api devolve o index.html (necessário para o
@@ -34,7 +38,9 @@ app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(pastaFront, 'index.html'));
 });
 
-const PORT = 3001;
+// No alwaysdata a porta é definida pela variável de ambiente PORT
+// (o app deve escutar nela; o padrão do listen já cobre IPv4 e IPv6).
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`GestorML backend rodando em http://localhost:${PORT}`);
+  console.log(`GestorML backend rodando na porta ${PORT}`);
 });

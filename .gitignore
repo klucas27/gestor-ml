@@ -6,8 +6,9 @@ node_modules/
 *.env
 !.env.exemplo
 
-# ---- Build do front-end (gerado por npm run build) ----
+# ---- Build do front-end (gerado por npm run build / build-deploy.sh) ----
 frontend/dist/
+backend/public/
 dist/
 dist-ssr/
 *.local

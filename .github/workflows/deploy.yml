@@ -1,0 +1,79 @@
+# deploy.yml — deploy automático no alwaysdata a cada push na main
+#
+# Estratégia pensada para o plano FREE do alwaysdata (256MB de RAM):
+#   - TODO o trabalho pesado (npm ci, vite build) roda AQUI no runner do
+#     GitHub, nunca no servidor. Rodar npm/vite lá estoura a memória.
+#   - As dependências do back-end (express, cors, dotenv, pg) são JS puro,
+#     sem binários nativos, então o node_modules instalado no runner Linux
+#     funciona no servidor e vai junto no rsync.
+#   - O servidor só recebe arquivos prontos e roda `node server.js`.
+#
+# Secrets necessários (Settings → Secrets and variables → Actions):
+#   ALWAYSDATA_SSH_HOST   ex.: ssh-minhaconta.alwaysdata.net
+#   ALWAYSDATA_SSH_USER   ex.: minhaconta
+#   ALWAYSDATA_SSH_KEY    chave SSH PRIVADA (a pública vai no painel/servidor)
+#   ALWAYSDATA_API_KEY    gerada em Perfil → API do painel alwaysdata
+#   ALWAYSDATA_ACCOUNT    nome da conta alwaysdata
+#   ALWAYSDATA_SITE_ID    id numérico do site (aparece na URL do painel)
+name: Deploy no alwaysdata
+
+on:
+  push:
+    branches: [main]
+
+# Evita dois deploys simultâneos brigando pelo mesmo servidor
+concurrency:
+  group: deploy-alwaysdata
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      - name: Compilar o front-end
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Copiar o front compilado para dentro do back-end
+        run: |
+          rm -rf backend/public
+          cp -r frontend/dist backend/public
+
+      - name: Instalar dependências de produção do back-end
+        working-directory: backend
+        run: npm ci --omit=dev
+
+      - name: Configurar a chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.ALWAYSDATA_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Enviar os arquivos para o servidor (rsync)
+        run: |
+          rsync -az --delete \
+            --exclude='.env' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            backend/ \
+            "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:www/gestor-ml/"
+
+      - name: Reiniciar o site no alwaysdata
+        run: |
+          curl --silent --fail --show-error -X POST \
+            --basic --user "${{ secrets.ALWAYSDATA_API_KEY }} account=${{ secrets.ALWAYSDATA_ACCOUNT }}:" \
+            "https://api.alwaysdata.com/v1/site/${{ secrets.ALWAYSDATA_SITE_ID }}/restart/"
