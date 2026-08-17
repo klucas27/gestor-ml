@@ -28,9 +28,9 @@ resolver um problema real de um pequeno empreendedor da comunidade, alinhado aos
 |---|---|
 | ![Calculadora](docs/print-calculadora.png) | ![Registrar venda](docs/print-registrar-venda.png) |
 
-| Histórico de vendas |
-|---|
-| ![Histórico](docs/print-historico.png) |
+| Histórico de vendas | Login |
+|---|---|
+| ![Histórico](docs/print-historico.png) | ![Login](docs/print-login.png) |
 
 ## Design e interface (UI/UX)
 
@@ -144,11 +144,20 @@ npm install
 cp .env.exemplo .env
 ```
 
-Abra o arquivo `.env` e ajuste a linha com o **usuário e a senha do seu
-PostgreSQL**:
+Abra o arquivo `.env` e ajuste o **usuário e a senha do seu PostgreSQL** e o
+**login do sistema**:
 
 ```
 DATABASE_URL=postgres://usuario:senha@localhost:5432/gestorml
+USUARIO_ACESSO=vendedor
+SENHA_ACESSO=troque-esta-senha
+SEGREDO_TOKEN=valor-aleatorio-longo
+```
+
+Gere o `SEGREDO_TOKEN` com:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Inicie o servidor:
@@ -207,13 +216,60 @@ npm start
 Agora **todo o sistema** fica em um único endereço:
 **http://localhost:3001**. Esse é o link que o vendedor vai usar.
 
+### Atalho: gerar a pasta pronta com um comando
+
+```bash
+./build-deploy.sh
+```
+
+O script compila o front, copia para dentro do back-end e monta a pasta
+`deploy/` com tudo junto (API + front estático + `node_modules` de produção),
+além do pacote `gestor-ml-deploy.tar.gz`. Para rodar essa pasta:
+
+```bash
+cd deploy && node server.js     # http://localhost:3001
+```
+
+É exatamente essa pasta que vai para o servidor. Para publicar no alwaysdata,
+veja **[docs/DEPLOY.md](docs/DEPLOY.md)** — por GitHub Actions (automático a
+cada `git push`) ou pelo script `./enviar-alwaysdata.sh` (manual, por rsync).
+
+---
+
+## Login (autenticação)
+
+O sistema é de uso pessoal do vendedor, então tem **um único login**, definido
+no arquivo `.env` do servidor — não há cadastro de usuários nem banco de senhas:
+
+| Variável | Para que serve |
+|---|---|
+| `USUARIO_ACESSO` | usuário digitado na tela de entrada |
+| `SENHA_ACESSO` | senha digitada na tela de entrada |
+| `SEGREDO_TOKEN` | assina o token de sessão (trocar desconecta todo mundo) |
+
+Como funciona: a tela de login envia usuário e senha para `POST /api/login`; o
+back-end confere e devolve um **token assinado com HMAC-SHA256** válido por 30
+dias. O front guarda esse token no navegador e o envia no cabeçalho
+`Authorization: Bearer …` em todas as chamadas. Todas as rotas da API — exceto
+o próprio login — exigem token válido; sem ele a resposta é `401` e o sistema
+volta para a tela de entrada. O botão **Sair**, no rodapé do menu, apaga o
+token do navegador.
+
+É uma autenticação **básica**, adequada ao escopo do projeto (um usuário, uso
+pessoal). Para uso multiusuário seriam necessários cadastro, senhas com hash
+(bcrypt/argon2) e controle de permissões.
+
+> Sempre publique o sistema em **HTTPS** (no alwaysdata já vem por padrão) para
+> a senha não trafegar aberta.
+
 ---
 
 ## Como usar no dia a dia (para o vendedor)
 
 Guia simples, sem termos técnicos. O fluxo de um dia normal:
 
-1. **Abra o sistema** no atalho do navegador (ícone na área de trabalho). Vai
+1. **Abra o sistema** no atalho do navegador (ícone na área de trabalho),
+   digite seu usuário e sua senha e clique em **Entrar**. Depois disso vai
    cair direto no **Painel** (Dashboard), com o resumo do mês.
 2. **Cadastre seus produtos** (só na primeira vez, ou quando tiver item novo).
    Vá em **Produtos → Novo produto**, preencha o nome, o custo (quanto você pagou)
@@ -241,9 +297,13 @@ Guia simples, sem termos técnicos. O fluxo de um dia normal:
 - [ ] Baixar o projeto e **restaurar o schema**: `psql -d gestorml -f backend/schema.sql`
       (sem o `seed.sql`, para começar do zero).
 - [ ] Criar o arquivo `backend/.env` com a senha correta do banco.
+- [ ] Definir no `.env` o **login do vendedor** (`USUARIO_ACESSO`,
+      `SENHA_ACESSO`) e um `SEGREDO_TOKEN` aleatório — escolher a senha
+      **junto com ele** e anotar num lugar seguro.
 - [ ] Rodar `npm install` no **backend** e no **frontend**.
-- [ ] Gerar o build do front: `cd frontend && npm run build`.
-- [ ] Iniciar o sistema: `cd backend && npm start`.
+- [ ] Gerar a pasta pronta: `./build-deploy.sh` (ou `cd frontend && npm run build`).
+- [ ] Iniciar o sistema: `cd deploy && node server.js` (ou `cd backend && npm start`).
+- [ ] Fazer o **primeiro login junto com o vendedor** e mostrar o botão "Sair".
 - [ ] Criar um **atalho do navegador** na área de trabalho apontando para
       **http://localhost:3001** (nome do atalho: "GestorML").
 - [ ] **Cadastrar 1 ou 2 produtos reais** junto com o vendedor.

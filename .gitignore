@@ -35,3 +35,8 @@ Thumbs.db
 
 # ---- Claude Code (worktrees temporárias) ----
 .claude/worktrees/
+
+# ---- Deploy (gerados por build-deploy.sh) ----
+deploy/
+gestor-ml-deploy.tar.gz
+alwaysdata.conf

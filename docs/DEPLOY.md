@@ -59,8 +59,23 @@ mortos pelo servidor. Por isso:
    mkdir -p ~/www/gestor-ml
    cat > ~/www/gestor-ml/.env <<'EOF'
    DATABASE_URL=postgres://usuario:senha@postgresql-minhaconta.alwaysdata.net:5432/minhaconta_gestorml
+   USUARIO_ACESSO=vendedor
+   SENHA_ACESSO=uma-senha-boa-aqui
+   SEGREDO_TOKEN=cole-aqui-um-valor-aleatorio-longo
    EOF
    ```
+
+   `USUARIO_ACESSO` e `SENHA_ACESSO` são o login da tela de entrada do
+   sistema. `SEGREDO_TOKEN` assina o token de sessão — gere um valor
+   aleatório com:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+
+   Trocar o `SEGREDO_TOKEN` desconecta quem já estava logado (útil se a senha
+   vazar). Sem essas três variáveis o sistema sobe com o login padrão
+   `vendedor` / `gestor123` — **não deixe assim em produção**.
 
 ## Passo 4 — API key do alwaysdata (para reiniciar o site)
 
@@ -97,11 +112,61 @@ envia tudo por `rsync` para `~/www/gestor-ml/` e reinicia o site pela API.
 Acompanhe na aba **Actions** do GitHub. O site fica em
 `https://minhaconta.alwaysdata.net`.
 
+## Caminho alternativo — deploy manual (sem GitHub Actions)
+
+Se não quiser configurar os secrets, use os dois scripts da raiz do projeto.
+
+```bash
+./build-deploy.sh
+```
+
+Ele compila o front, copia o resultado para dentro do back-end e monta a pasta
+`deploy/` — **back-end + front estático no mesmo lugar**, com o `node_modules`
+de produção já instalado. Também gera `gestor-ml-deploy.tar.gz` para upload.
+Conteúdo da pasta:
+
+```
+deploy/
+  server.js  auth.js  db.js  package.json  package-lock.json
+  routes/        (API: login, produtos, vendas, dashboard, taxas)
+  public/        (front compilado — o Express serve daqui)
+  node_modules/  (dependências de produção, prontas)
+  schema.sql  seed.sql  .env.exemplo
+```
+
+Teste a pasta antes de subir (é exatamente o que roda no servidor):
+
+```bash
+cd deploy && node server.js     # http://localhost:3001
+```
+
+Para enviar, crie `alwaysdata.conf` na raiz do projeto (não vai para o git):
+
+```bash
+CONTA=minhaconta
+SSH_HOST=ssh-minhaconta.alwaysdata.net
+SSH_USER=minhaconta
+PASTA_REMOTA=www/gestor-ml
+API_KEY=          # opcional: reinicia o site sozinho
+SITE_ID=          # opcional
+```
+
+E rode:
+
+```bash
+./enviar-alwaysdata.sh              # build + envio por rsync
+./enviar-alwaysdata.sh --so-enviar  # envia a pasta deploy/ já pronta
+```
+
+O envio preserva o `.env` que está no servidor. Sem SSH, dá para subir o
+`gestor-ml-deploy.tar.gz` pelo gerenciador de arquivos do painel
+(**Remote access → FTP** ou **Files**) e extrair em `www/gestor-ml`.
+
 ## Testar o build localmente (opcional)
 
 ```bash
-./build-deploy.sh        # compila o front e copia para backend/public
-node backend/server.js   # abre http://localhost:3001 com front + API juntos
+./build-deploy.sh        # gera deploy/ e o pacote .tar.gz
+cd deploy && node server.js   # http://localhost:3001 com front + API juntos
 ```
 
 ## Solução de problemas
