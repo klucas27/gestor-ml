@@ -5,6 +5,8 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
+const { exigirLogin } = require('./auth');
+const login = require('./routes/login');
 const produtos = require('./routes/produtos');
 const vendas = require('./routes/vendas');
 const dashboard = require('./routes/dashboard');
@@ -16,11 +18,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Montagem das rotas da API
-app.use('/api/produtos', produtos);
-app.use('/api/vendas', vendas);
-app.use('/api/dashboard', dashboard);
-app.use('/api/taxas', taxas);
+// Login: única rota pública da API
+app.use('/api/login', login);
+
+// Demais rotas exigem o token devolvido pelo login (exigirLogin)
+app.use('/api/produtos', exigirLogin, produtos);
+app.use('/api/vendas', exigirLogin, vendas);
+app.use('/api/dashboard', exigirLogin, dashboard);
+app.use('/api/taxas', exigirLogin, taxas);
 
 // ---------- Produção: servir o front-end já compilado ----------
 // No deploy (alwaysdata) o script de build copia frontend/dist para

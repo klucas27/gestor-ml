@@ -48,6 +48,14 @@ const CAMINHOS = {
       <path d="M16 7.5c-.8-1-2.2-1.5-4-1.5-2.2 0-3.8 1.1-3.8 2.8 0 3.8 7.9 1.9 7.9 5.9 0 1.8-1.7 2.8-4.1 2.8-1.9 0-3.4-.6-4.2-1.6" />
     </>
   ),
+  // Porta com seta (Sair do sistema)
+  sair: (
+    <>
+      <path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8" />
+      <path d="M17 15l3-3-3-3" />
+      <path d="M20 12h-9" />
+    </>
+  ),
 }
 
 export default function Icone({ nome, tamanho = 18 }) {

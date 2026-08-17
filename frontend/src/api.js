@@ -2,15 +2,29 @@
 // Em desenvolvimento (npm run dev) o front roda na porta 5173 e chama o
 // back-end direto em http://localhost:3001. Em produção o Express serve o
 // front e a API no MESMO endereço, então usamos o caminho relativo /api.
+import { obterToken, salvarSessao, avisarSessaoExpirada } from './sessao.js';
+
 const BASE = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
 
 // Executa o fetch e trata o erro de forma padronizada.
 // Se a resposta não for ok, lança Error com o campo "erro" do JSON.
 async function requisicao(caminho, opcoes = {}) {
+  const token = obterToken();
   const resposta = await fetch(BASE + caminho, {
-    headers: { 'Content-Type': 'application/json' },
     ...opcoes,
+    headers: {
+      'Content-Type': 'application/json',
+      // Token do login: o back-end só responde às rotas protegidas com ele
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(opcoes.headers || {}),
+    },
   });
+
+  // Token expirado ou inválido: derruba a sessão e volta para a tela de login
+  if (resposta.status === 401 && caminho !== '/login') {
+    avisarSessaoExpirada();
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
 
   // Tenta ler o corpo como JSON (pode estar vazio em alguns casos)
   let dados = null;
@@ -40,6 +54,21 @@ function montarQuery(filtros = {}) {
     }
   }
   return partes.length ? `?${partes.join('&')}` : '';
+}
+
+// ---------- LOGIN ----------
+export async function entrar(usuario, senha) {
+  const dados = await requisicao('/login', {
+    method: 'POST',
+    body: JSON.stringify({ usuario, senha }),
+  });
+  salvarSessao(dados.token, dados.usuario);
+  return dados;
+}
+
+// Confere se o token guardado no navegador ainda é válido
+export function verificarSessao() {
+  return requisicao('/login/sessao');
 }
 
 // ---------- PRODUTOS ----------
