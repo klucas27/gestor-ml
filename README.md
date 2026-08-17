@@ -231,8 +231,8 @@ cd deploy && node server.js     # http://localhost:3001
 ```
 
 É exatamente essa pasta que vai para o servidor. Para publicar no alwaysdata,
-veja **[docs/DEPLOY.md](docs/DEPLOY.md)** — por GitHub Actions (automático a
-cada `git push`) ou pelo script `./enviar-alwaysdata.sh` (manual, por rsync).
+veja **[docs/DEPLOY.md](docs/DEPLOY.md)**: o envio é manual — `./enviar-alwaysdata.sh`
+(rsync por SSH) ou upload da pasta `deploy/` pelo FTP do painel.
 
 ---
 
